@@ -12,6 +12,10 @@ import java.awt.*;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Cell {
 
+    Long cellId;
+
+    Boolean cellInUse;
+
     Color cellColor;
 
     Color hoverColor;
@@ -20,6 +24,7 @@ public class Cell {
         return Cell.builder()
                 .cellColor(Color.BLUE)
                 .hoverColor(Color.ORANGE)
+                .cellInUse(Boolean.FALSE)
                 .build();
     }
 }

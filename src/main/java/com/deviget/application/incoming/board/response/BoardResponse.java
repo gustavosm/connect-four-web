@@ -1,5 +1,6 @@
-package com.deviget.application.incoming.response;
+package com.deviget.application.incoming.board.response;
 
+import com.deviget.domain.board.enums.BoardStatus;
 import com.deviget.domain.board.model.Board;
 import com.deviget.domain.board.model.Cell;
 import lombok.*;
@@ -17,7 +18,7 @@ import static com.deviget.domain.utils.ColorConverter.buildRGBArray;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class BoardResponse {
 
-    List<CellResponse> cellList;
+    int[] backgroundRGBAlphaArray;
 
     Long cellLength;
 
@@ -25,13 +26,16 @@ public class BoardResponse {
 
     Long columnNum;
 
-    int[] backgroundRGBAlphaArray;
+    String boardStatus;
+
+    List<CellResponse> cellList;
 
     public static BoardResponse of(Board board) {
         return BoardResponse.builder()
                 .cellLength(board.getCellLength())
                 .rowNum(board.getRowNum())
                 .columnNum(board.getColumnNum())
+                .boardStatus(board.getBoardStatus().name())
                 .backgroundRGBAlphaArray(buildRGBArray(board.getBackgroundColor()))
                 .cellList(buildCellList(board.getCellList())).build();
     }
