@@ -6,6 +6,8 @@ import com.deviget.domain.board.model.Cell;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.awt.*;
+
 @Slf4j
 @Service
 public class CellService {
@@ -22,10 +24,15 @@ public class CellService {
             id = getLastFreeIdOfColumn(board, id, columnNum, cellNum);
 
             Cell usedCell = board.getCell(id);
-            usedCell.setCellInUse(Boolean.TRUE);
+            markCellAsUsed(usedCell);
             return usedCell;
         }
         throw new InvalidMovementRequest("The chosen column is full.");
+    }
+
+    private void markCellAsUsed(Cell usedCell) {
+        usedCell.setCellInUse(Boolean.TRUE);
+        usedCell.setCellColor(Color.RED);
     }
 
     private Long getLastFreeIdOfColumn(Board board, Long id, Long columnNum, Long cellNum) {

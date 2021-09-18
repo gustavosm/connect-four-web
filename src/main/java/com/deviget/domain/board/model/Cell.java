@@ -22,7 +22,7 @@ public class Cell {
 
     public static Cell buildDefaultCell() {
         return Cell.builder()
-                .cellColor(Color.BLUE)
+                .cellColor(Color.WHITE)
                 .hoverColor(Color.ORANGE)
                 .cellInUse(Boolean.FALSE)
                 .build();

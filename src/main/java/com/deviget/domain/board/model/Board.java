@@ -9,7 +9,6 @@ import org.springframework.util.CollectionUtils;
 
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 @Data
