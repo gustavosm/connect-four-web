@@ -21,7 +21,9 @@ public class CellService {
         if (!board.getCell(id).getCellInUse()) {
             id = getLastFreeIdOfColumn(board, id, columnNum, cellNum);
 
-            return board.getCell(id);
+            Cell usedCell = board.getCell(id);
+            usedCell.setCellInUse(Boolean.TRUE);
+            return usedCell;
         }
         throw new InvalidMovementRequest("The chosen column is full.");
     }

@@ -9,4 +9,5 @@ public class ConnectFourWebApplication {
     public static void main(String[] args) {
         SpringApplication.run(ConnectFourWebApplication.class, args);
     }
+
 }
