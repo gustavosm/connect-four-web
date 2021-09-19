@@ -3,8 +3,10 @@ package com.deviget.application.incoming.board;
 import com.deviget.application.incoming.board.request.CellRequest;
 import com.deviget.application.incoming.board.response.BoardResponse;
 import com.deviget.application.incoming.board.response.CellResponse;
+import com.deviget.application.incoming.board.response.MovementResponse;
 import com.deviget.domain.board.model.Board;
 import com.deviget.domain.board.model.Cell;
+import com.deviget.domain.board.model.Movement;
 import com.deviget.domain.board.service.BoardService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AccessLevel;
@@ -23,6 +25,8 @@ import org.springframework.web.bind.annotation.*;
 @AllArgsConstructor(onConstructor_ = @Autowired)
 public class BoardResource {
 
+    public static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+
     BoardService boardService;
 
     @PostMapping(value = "/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -35,10 +39,10 @@ public class BoardResource {
     @PostMapping(value = "/play/{userId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity play(@PathVariable("userId") Long userId, @RequestBody CellRequest cellRequest) {
         try {
-            Cell newCell = boardService.doMovement(userId, cellRequest.toCell());
-            return ResponseEntity.ok(CellResponse.of(newCell));
+            Movement movement = boardService.doMovement(userId, cellRequest.toCell());
+            return ResponseEntity.ok(MovementResponse.of(movement));
         } catch (Exception ex) {
-            return ResponseEntity.badRequest().body(new ObjectMapper().writeValueAsString(ex.getMessage()));
+            return ResponseEntity.badRequest().body(OBJECT_MAPPER.writeValueAsString(ex.getMessage()));
         }
     }
 

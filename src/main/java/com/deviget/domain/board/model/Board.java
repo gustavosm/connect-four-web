@@ -26,6 +26,8 @@ public class Board {
 
     Long cellLength;
 
+    Long availableMovements;
+
     Color backgroundColor;
 
     BoardStatus boardStatus;
@@ -37,9 +39,29 @@ public class Board {
         this.rowNum = 6L;
         this.columnNum = 7L;
         this.cellLength = 60L;
+        this.availableMovements = rowNum * columnNum;
         this.boardStatus = BoardStatus.ON_GOING;
         this.cellList = buildDefaultCellList();
         this.backgroundColor = Color.BLACK;
+    }
+
+    public Cell getCell(Long cellId) {
+        if (cellId < 0 || CollectionUtils.isEmpty(cellList) || cellId >= cellList.size()) {
+            throw new InvalidMovementRequest(String.format("CellID %d is negative or out of bound.", cellId));
+        }
+        return this.cellList.get(cellId.intValue());
+    }
+
+    public Long getCellNum() {
+        return rowNum * columnNum;
+    }
+
+    public void adjustMovements() {
+        --availableMovements;
+    }
+
+    public Boolean isATie() {
+        return availableMovements == 0;
     }
 
     private List<Cell> buildDefaultCellList() {
@@ -54,10 +76,7 @@ public class Board {
         return cellList;
     }
 
-    public Cell getCell(Long cellId) {
-        if (cellId < 0 || CollectionUtils.isEmpty(cellList) || cellId >= cellList.size()) {
-            throw new InvalidMovementRequest(String.format("CellID %d is negative or out of bound.", cellId));
-        }
-        return this.cellList.get(cellId.intValue());
+    public boolean onGoing() {
+        return boardStatus == BoardStatus.ON_GOING;
     }
 }
