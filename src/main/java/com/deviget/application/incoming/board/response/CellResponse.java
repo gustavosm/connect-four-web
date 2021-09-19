@@ -19,14 +19,11 @@ public class CellResponse {
 
     int[] backgroundRGBAlphaArray;
 
-    int[] hoverRGBAlphaArray;
-
     public static CellResponse of(Cell cell) {
         return CellResponse.builder()
                 .cellId(cell.getCellId())
                 .cellInUse(cell.getCellInUse())
                 .backgroundRGBAlphaArray(buildRGBArray(cell.getCellColor()))
-                .hoverRGBAlphaArray(buildRGBArray(cell.getHoverColor()))
                 .build();
     }
 

@@ -18,12 +18,9 @@ public class Cell {
 
     Color cellColor;
 
-    Color hoverColor;
-
     public static Cell buildDefaultCell() {
         return Cell.builder()
                 .cellColor(Color.WHITE)
-                .hoverColor(Color.ORANGE)
                 .cellInUse(Boolean.FALSE)
                 .build();
     }
