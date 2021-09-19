@@ -33,7 +33,7 @@ public class BotRandomStrategy implements BotStrategy {
     }
 
     private long getRandomCellId(Long cellNum) {
-        return secureRandom.nextLong() % cellNum;
+        return Math.abs(secureRandom.nextLong()) % cellNum;
     }
 
 }

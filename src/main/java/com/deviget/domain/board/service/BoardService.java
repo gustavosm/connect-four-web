@@ -56,16 +56,16 @@ public class BoardService {
 
     public Movement doMovement(Long userId, Cell clickedCell) {
         Board board = boardRepo.get(userId);
-        checkBoard(board);
+        checkBoard(userId, board);
         Cell humanChosenCell = cellService.doMovement(board, clickedCell.getCellId());
         Cell botChosenCell = botEngine.doMovement(board);
         checkIfIsAFinalStage(board, humanChosenCell, botChosenCell);
         return buildResponse(board, humanChosenCell, botChosenCell);
     }
 
-    private void checkBoard(Board board) {
-        if (!Objects.isNull(board)) {
-            throw new BoardUninitializedException(String.format("Board for User %d is not initialized yet.", board.getUserId()));
+    private void checkBoard(Long userId, Board board) {
+        if (Objects.isNull(board)) {
+            throw new BoardUninitializedException(String.format("Board for User %d is not initialized yet.", userId));
         }
         if (!board.onGoing()) {
             throw new BoardAlreadyFinishedException("Can't do any movement on this board. Press restart button.");
@@ -81,7 +81,7 @@ public class BoardService {
         } else if (board.isATie()) {
             finalizeBoard(board, TIE);
         }
-
+        log.info("Final stage checked. Result: " + board.getBoardStatus());
     }
 
     private boolean isAWinMovementFrom(Board board, Cell chosenCell) {
@@ -97,7 +97,7 @@ public class BoardService {
         Long alignedCellsToWin = doAllPossibleMovements(directionData, 4L, direction::nextUpMovement);
         if (alignedCellsToWin != 0L) {
             directionData.setActualCellId(actualCellId);
-            alignedCellsToWin = doAllPossibleMovements(directionData, alignedCellsToWin, direction::nextDownMovement);
+            alignedCellsToWin = doAllPossibleMovements(directionData, alignedCellsToWin + 1L, direction::nextDownMovement);
         }
         return alignedCellsToWin == 0L;
     }
