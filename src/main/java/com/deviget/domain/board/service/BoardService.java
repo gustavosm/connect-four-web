@@ -85,15 +85,17 @@ public class BoardService {
     }
 
     private boolean isAWinMovementFrom(Board board, Cell chosenCell) {
-        DirectionData directionData = DirectionData.builder().actualCellId(chosenCell.getCellId()).board(board).build();
-        return checkWin(VERTICAL_DIRECTION, directionData)
-                || checkWin(HORIZONTAL_DIRECTION, directionData)
-                || checkWin(POSITIVE_DIAGONAL_DIRECTION, directionData)
-                || checkWin(NEGATIVE_DIAGONAL_DIRECTION, directionData);
+        return checkWin(VERTICAL_DIRECTION, board, chosenCell)
+                || checkWin(HORIZONTAL_DIRECTION, board, chosenCell)
+                || checkWin(POSITIVE_DIAGONAL_DIRECTION, board, chosenCell)
+                || checkWin(NEGATIVE_DIAGONAL_DIRECTION, board, chosenCell);
     }
 
-    private boolean checkWin(Direction direction, DirectionData directionData) {
-        Long actualCellId = directionData.getActualCellId();
+    private boolean checkWin(Direction direction, Board board, Cell chosenCell) {
+        Long actualCellId = chosenCell.getCellId();
+
+        DirectionData directionData = DirectionData.builder().actualCellId(actualCellId).board(board).build();
+
         Long alignedCellsToWin = doAllPossibleMovements(directionData, 4L, direction::nextUpMovement);
         if (alignedCellsToWin != 0L) {
             directionData.setActualCellId(actualCellId);

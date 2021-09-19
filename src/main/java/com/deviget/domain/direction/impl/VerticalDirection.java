@@ -4,7 +4,9 @@ import com.deviget.domain.board.model.Board;
 import com.deviget.domain.board.model.Cell;
 import com.deviget.domain.direction.Direction;
 import com.deviget.domain.direction.model.DirectionData;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class VerticalDirection implements Direction {
 
     @Override
@@ -16,7 +18,7 @@ public class VerticalDirection implements Direction {
         Long nextCellId = actualCellId - columnNum;
 
         Cell startCell = board.getCell(actualCellId);
-        if (outOfUpMovementBound(nextCellId) || checkIfSameUser(board, nextCellId, startCell)) {
+        if (outOfUpMovementBound(nextCellId) || !checkIfSameUser(board, nextCellId, startCell)) {
             return -1L;
         }
         return nextCellId;
@@ -30,7 +32,7 @@ public class VerticalDirection implements Direction {
 
         Long nextCellId = actualCellId + columnNum;
         Cell startCell = board.getCell(actualCellId);
-        if (outOfDownMovementBound(board, nextCellId) || checkIfSameUser(board, nextCellId, startCell)) {
+        if (outOfDownMovementBound(board, nextCellId) || !checkIfSameUser(board, nextCellId, startCell)) {
             return -1L;
         }
         return nextCellId;

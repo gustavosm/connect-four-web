@@ -4,7 +4,9 @@ import com.deviget.domain.board.model.Board;
 import com.deviget.domain.board.model.Cell;
 import com.deviget.domain.direction.Direction;
 import com.deviget.domain.direction.model.DirectionData;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class PositiveDiagonalDirection implements Direction {
 
     @Override
@@ -17,7 +19,8 @@ public class PositiveDiagonalDirection implements Direction {
         Long nextCellId = actualCellId - columnNum + 1;
 
         Cell startCell = board.getCell(actualCellId);
-        if (outOfUpMovementBound(nextCellId, columnNum) || checkIfSameUser(board, nextCellId, startCell)) {
+        log.info("Olhando para: " + actualCellId + " indo para " + nextCellId);
+        if (outOfUpMovementBound(nextCellId, columnNum) || !checkIfSameUser(board, nextCellId, startCell)) {
             return -1L;
         }
         return nextCellId;
@@ -33,7 +36,8 @@ public class PositiveDiagonalDirection implements Direction {
         Long nextCellId = actualCellId + columnNum - 1;
 
         Cell startCell = board.getCell(actualCellId);
-        if (outOfDownMovementBound(board, nextCellId) || checkIfSameUser(board, nextCellId, startCell)) {
+        log.info("Olhando para: " + actualCellId + " indo para " + nextCellId);
+        if (outOfDownMovementBound(board, nextCellId) || !checkIfSameUser(board, nextCellId, startCell)) {
             return -1L;
         }
         return nextCellId;

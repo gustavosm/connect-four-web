@@ -9,33 +9,33 @@ $(document).ready(function(){
         url: "http://localhost:8090/board/1",
         success: function(data) {
             boardStatus = data['boardStatus'];
-            if (boardStatus == "ON_GOING") {
-                setBackgroundColor(data['backgroundRGBAlphaArray'], ".grid");
-                var cellList = data['cellList'];
-                $(".cell").each(function(){
-                    $(this).attr("id", cellList[count].cellId);
-                    $(this).attr("data-player", (cellList[count].cellInUse ? 1 : 0));
-                    setBackgroundColor(cellList[count].backgroundRGBAlphaArray, this);
-                    $(this).click(function(){
-                        performClick($(this).attr("id"));
-                    });
-                    $(this).mouseenter(function() {
-                        if (!finalStage) {
-                            if ($(this).attr("data-player") == 0) {
-                                $(this).toggleClass("cell_hover", true);
-                            }
-                        }
-                    });
-                    $(this).mouseleave(function() {
-                        if (!finalStage) {
-                            if ($(this).attr("data-player") == 0) {
-                                $(this).toggleClass("cell_hover", false);
-                            }
-                        }
-                    });
-                    count++;
+            setBackgroundColor(data['backgroundRGBAlphaArray'], ".grid");
+            var cellList = data['cellList'];
+            $(".cell").each(function(){
+                $(this).attr("id", cellList[count].cellId);
+                $(this).attr("data-player", (cellList[count].cellInUse ? 1 : 0));
+                setBackgroundColor(cellList[count].backgroundRGBAlphaArray, this);
+                $(this).click(function(){
+                    performClick($(this).attr("id"));
+                    $(this).toggleClass("cell_hover", false);
                 });
-            } else {
+                $(this).mouseenter(function() {
+                    if (!finalStage) {
+                        if ($(this).attr("data-player") == 0) {
+                            $(this).toggleClass("cell_hover", true);
+                        }
+                    }
+                });
+                $(this).mouseleave(function() {
+                    if (!finalStage) {
+                        if ($(this).attr("data-player") == 0) {
+                            $(this).toggleClass("cell_hover", false);
+                        }
+                    }
+                });
+                count++;
+            });
+            if (boardStatus !== "ON_GOING") {
                 alertMessage = processBoardStatus(boardStatus);
                 alert(alertMessage);
             }

@@ -17,7 +17,7 @@ public class NegativeDiagonalDirection implements Direction {
         Long nextCellId = actualCellId - columnNum - 1;
 
         Cell startCell = board.getCell(actualCellId);
-        if (outOfUpMovementBound(nextCellId, columnNum) || checkIfSameUser(board, nextCellId, startCell)) {
+        if (outOfUpMovementBound(nextCellId, columnNum) || !checkIfSameUser(board, nextCellId, startCell)) {
             return -1L;
         }
         return nextCellId;
@@ -33,7 +33,7 @@ public class NegativeDiagonalDirection implements Direction {
         Long nextCellId = actualCellId + columnNum + 1;
 
         Cell startCell = board.getCell(actualCellId);
-        if (outOfDownMovementBound(board, nextCellId) || checkIfSameUser(board, nextCellId, startCell)) {
+        if (outOfDownMovementBound(board, nextCellId) || !checkIfSameUser(board, nextCellId, startCell)) {
             return -1L;
         }
         return nextCellId;
