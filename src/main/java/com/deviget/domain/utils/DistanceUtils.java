@@ -8,8 +8,8 @@ import lombok.experimental.UtilityClass;
 public class DistanceUtils {
 
     public static Long calculateDistance(Board board, Long firstCellId, Long lastCellId) {
-        LongPair startPoint = new LongPair(firstCellId / board.getColumnNum(), firstCellId / board.getRowNum());
-        LongPair endPoint = new LongPair(lastCellId / board.getColumnNum(), lastCellId / board.getRowNum());
+        LongPair startPoint = new LongPair(firstCellId / board.getColumnNum(), firstCellId % board.getColumnNum());
+        LongPair endPoint = new LongPair(lastCellId / board.getColumnNum(), lastCellId % board.getColumnNum());
 
         Long rowDiff = endPoint.getFirst() - startPoint.getFirst();
         Long columnDiff = endPoint.getSecond() - startPoint.getSecond();
