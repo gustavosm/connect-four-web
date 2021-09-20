@@ -4,10 +4,12 @@ import com.deviget.domain.board.model.Board;
 import com.deviget.domain.board.model.Cell;
 import com.deviget.domain.board.service.CellService;
 import com.deviget.domain.bot.strategy.BotStrategy;
+import com.deviget.domain.common.LongPair;
 import com.deviget.domain.direction.Direction;
 import com.deviget.domain.direction.impl.HorizontalDirection;
 import com.deviget.domain.direction.impl.NegativeDiagonalDirection;
 import com.deviget.domain.direction.impl.PositiveDiagonalDirection;
+import com.deviget.domain.direction.impl.VerticalDirection;
 import com.deviget.domain.direction.model.DirectionData;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -15,30 +17,36 @@ import org.springframework.stereotype.Component;
 
 import java.util.function.Function;
 
+import static com.deviget.domain.utils.DistanceUtils.calculateDistance;
+
 @Slf4j
 @Component
 @ConditionalOnProperty(value = "strategy.ai", havingValue = "true")
 public class BotAIStrategy implements BotStrategy {
 
-    Direction[] directions = {new HorizontalDirection(), new PositiveDiagonalDirection(), new NegativeDiagonalDirection()};
+    Direction[] directions = {new VerticalDirection(), new HorizontalDirection(), new PositiveDiagonalDirection(), new NegativeDiagonalDirection()};
 
     @Override
     public Cell choseACell(Board board, Cell humanChosenCell, CellService cellService) {
-        Long nextCellId;
+        Long nextCellId = -1L;
+        Long maxAlignedCells = -1L;
         Long humanChosenCellCellId = humanChosenCell.getCellId();
 
         DirectionData directionData = DirectionData.builder().actualCellId(humanChosenCellCellId)
                 .board(board).build();
 
         for (Direction direction : directions) {
-            nextCellId = canIAvoidWinInDirection(direction, directionData, board, humanChosenCell, cellService);
-            if (nextCellId != -1L) {
-                log.info("Escolhi a cell: " + nextCellId);
-                return board.getCell(nextCellId);
+            LongPair result = canIAvoidWinInDirection(direction, directionData, cellService);
+            if (result.getFirst() > maxAlignedCells) {
+                maxAlignedCells = result.getFirst();
+                nextCellId = result.getSecond();
+                if (maxAlignedCells == 3L) { //no way to find any greater then this
+                    return board.getCell(nextCellId);
+                }
             }
-            directionData.setActualCellId(humanChosenCellCellId);
+            resetDirectionData(directionData, humanChosenCellCellId);
         }
-        if (!isAValidAndEmptyCell((nextCellId = humanChosenCellCellId - board.getColumnNum()), board)) {
+        if (nextCellId == -1L) {
             nextCellId = choseAnEmptyCell(board, humanChosenCellCellId, cellService);
         }
         log.info("Escolhi a cell: " + nextCellId);
@@ -51,7 +59,7 @@ public class BotAIStrategy implements BotStrategy {
         Long firstIdOfColumn;
         int operator = 1;
         do {
-            if (onAnyBorder(columnNum, nextCellId)) {
+            if (isCellOnAnyBorder(columnNum, nextCellId)) {
                 operator *= -1;
             }
             nextCellId = (humanChosenCellId + operator) % columnNum;
@@ -62,64 +70,59 @@ public class BotAIStrategy implements BotStrategy {
         return nextCellId;
     }
 
-    private boolean onAnyBorder(Long columnNum, Long nextCellId) {
+    private boolean isCellOnAnyBorder(Long columnNum, Long nextCellId) {
         return nextCellId % columnNum == (columnNum - 1L) || nextCellId % columnNum == 0L;
     }
 
-    private Long canIAvoidWinInDirection(Direction direction, DirectionData directionData, Board board, Cell humanChosenCell, CellService cellService) {
+    private LongPair canIAvoidWinInDirection(Direction direction, DirectionData directionData, CellService cellService) {
 
-        int piecesAligned = getPiecesAligned(directionData, direction::nextLeftMovement);
-        // first try is to put a piece in the left-direction
-        if (piecesAligned >= 1 && !actualCellIsLastColumn(directionData)) {
-            Long actualCellId = direction.calcLeftMovement(directionData);
-            log.info("Aqui eu escolhi: " + actualCellId + " na " + direction.getClass());
-            Long possibleCellId = cellService.getLastFreeIdOfColumn(board, actualCellId);
-            if (possibleCellId.equals(actualCellId)) {
-                return possibleCellId;
-            }
-        }
-        //else -> it means I can't put a piece exactly right-direction the humanChosenCell
-        directionData.setActualCellId(humanChosenCell.getCellId());
-        piecesAligned += getPiecesAligned(directionData, direction::nextRightMovement);
-        if (piecesAligned >= 1 && !actualCellIsFirstColumn(directionData)) {
-            Long actualCellId = direction.calcRightMovement(directionData);
-            log.info("Aqui eu escolhi: " + actualCellId + " na " + direction.getClass());
-            Long possibleCellId = cellService.getLastFreeIdOfColumn(board, actualCellId);
-            if (possibleCellId.equals(actualCellId)) {
-                return possibleCellId;
-            }
-        }
-        return -1L;
-    }
-
-    private boolean isAValidAndEmptyCell(Long cellId, Board board) {
-        return cellId >= 0 && !board.getCell(cellId).getCellInUse();
-    }
-
-    private boolean actualCellIsLastColumn(DirectionData directionData) {
         Board board = directionData.getBoard();
+
+        Long nextCellId = 1L;
         Long actualCellId = directionData.getActualCellId();
-        Long columnNum = board.getColumnNum();
+        Long firstAlignedCell = getBorderAlignedCell(direction::nextLeftMovement, directionData);
 
-        return actualCellId % columnNum == columnNum - 1L;
-    }
+        resetDirectionData(directionData, actualCellId);
+        Long lastAlignedCell = getBorderAlignedCell(direction::nextRightMovement, directionData);
 
-    private boolean actualCellIsFirstColumn(DirectionData directionData) {
-        Board board = directionData.getBoard();
-        Long actualCellId = directionData.getActualCellId();
-        Long columnNum = board.getColumnNum();
+        if (firstAlignedCell.equals(lastAlignedCell)) {
+            resetDirectionData(directionData, actualCellId);
 
-        return actualCellId % columnNum == 0L;
-    }
+            Long firstTry = direction.calcLeftMovement(directionData);
+            Long pretendedCell = firstTry != -1 ? firstTry : direction.calcRightMovement(directionData);
 
-    private int getPiecesAligned(DirectionData directionData, Function<DirectionData, Long> directionFunction) {
-        Long nextCellId;
-        int piecesAligned = 0;
-
-        while ((nextCellId = directionFunction.apply(directionData)) != -1L) {
-            directionData.setActualCellId(nextCellId);
-            ++piecesAligned;
+            return new LongPair(1L, cellService.getLastFreeIdOfColumn(board, pretendedCell));
         }
-        return piecesAligned;
+
+        resetDirectionData(directionData, firstAlignedCell);
+        Long leftMovement = direction.calcLeftMovement(directionData);
+        if (leftMovement != -1L) {
+            nextCellId = cellService.getLastFreeIdOfColumn(board, leftMovement);
+        }
+        if (leftMovement == -1L || board.getCell(leftMovement).getCellInUse() || !leftMovement.equals(nextCellId)) {
+            resetDirectionData(directionData, lastAlignedCell);
+            Long rightMovement = direction.calcRightMovement(directionData);
+            if (rightMovement != -1L) {
+                nextCellId = cellService.getLastFreeIdOfColumn(board, rightMovement);
+            }
+            nextCellId = rightMovement != -1L && !board.getCell(rightMovement).getCellInUse() && rightMovement.equals(nextCellId)?
+                    rightMovement : -1L;
+        }
+        return new LongPair(calculateDistance(board, firstAlignedCell, lastAlignedCell), nextCellId);
+    }
+
+    private void resetDirectionData(DirectionData directionData, Long actualCellId) {
+        directionData.setActualCellId(actualCellId);
+    }
+
+    private Long getBorderAlignedCell(Function<DirectionData, Long> movementFunction, DirectionData directionData) {
+        Long iteratePoint;
+        Long alignedCell = directionData.getActualCellId();
+
+        while ((iteratePoint = movementFunction.apply(directionData)) != -1L) {
+            alignedCell = iteratePoint;
+            directionData.setActualCellId(alignedCell);
+        }
+        return alignedCell;
     }
 }
