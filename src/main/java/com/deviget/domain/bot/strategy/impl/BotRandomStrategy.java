@@ -5,12 +5,14 @@ import com.deviget.domain.board.model.Cell;
 import com.deviget.domain.board.service.CellService;
 import com.deviget.domain.bot.strategy.BotStrategy;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 import java.security.SecureRandom;
 
 @Slf4j
 @Component
+@ConditionalOnProperty(value = "strategy.ai", havingValue = "false", matchIfMissing = true)
 public class BotRandomStrategy implements BotStrategy {
 
     static final SecureRandom secureRandom = new SecureRandom();
