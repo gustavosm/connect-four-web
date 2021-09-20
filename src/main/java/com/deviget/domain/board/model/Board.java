@@ -36,12 +36,16 @@ public class Board {
 
     public Board(Long userId) {
         this.userId = userId;
+        setDefaultConditions();
+        this.cellList = buildDefaultCellList();
+    }
+
+    public void setDefaultConditions() {
         this.rowNum = 6L;
         this.columnNum = 7L;
         this.cellLength = 60L;
         this.availableMovements = rowNum * columnNum;
         this.boardStatus = BoardStatus.ON_GOING;
-        this.cellList = buildDefaultCellList();
         this.backgroundColor = Color.BLACK;
     }
 

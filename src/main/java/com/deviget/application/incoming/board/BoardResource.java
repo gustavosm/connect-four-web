@@ -2,10 +2,8 @@ package com.deviget.application.incoming.board;
 
 import com.deviget.application.incoming.board.request.CellRequest;
 import com.deviget.application.incoming.board.response.BoardResponse;
-import com.deviget.application.incoming.board.response.CellResponse;
 import com.deviget.application.incoming.board.response.MovementResponse;
 import com.deviget.domain.board.model.Board;
-import com.deviget.domain.board.model.Cell;
 import com.deviget.domain.board.model.Movement;
 import com.deviget.domain.board.service.BoardService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -14,7 +12,6 @@ import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.experimental.FieldDefaults;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -46,6 +43,8 @@ public class BoardResource {
         }
     }
 
-
-
+    @PostMapping("/restart/{userId}")
+    public ResponseEntity restart(@PathVariable("userId") Long userId) {
+        return ResponseEntity.ok(BoardResponse.of(boardService.restartBoard(userId)));
+    }
 }

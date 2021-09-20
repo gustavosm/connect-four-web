@@ -19,7 +19,6 @@ public class PositiveDiagonalDirection implements Direction {
         Long nextCellId = actualCellId - columnNum + 1;
 
         Cell startCell = board.getCell(actualCellId);
-        log.info("Olhando para: " + actualCellId + " indo para " + nextCellId);
         if (outOfUpMovementBound(nextCellId, columnNum) || !checkIfSameUser(board, nextCellId, startCell)) {
             return -1L;
         }
@@ -36,7 +35,6 @@ public class PositiveDiagonalDirection implements Direction {
         Long nextCellId = actualCellId + columnNum - 1;
 
         Cell startCell = board.getCell(actualCellId);
-        log.info("Olhando para: " + actualCellId + " indo para " + nextCellId);
         if (outOfDownMovementBound(board, nextCellId) || !checkIfSameUser(board, nextCellId, startCell)) {
             return -1L;
         }

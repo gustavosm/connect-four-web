@@ -4,7 +4,9 @@ import com.deviget.domain.board.model.Board;
 import com.deviget.domain.board.model.Cell;
 import com.deviget.domain.direction.Direction;
 import com.deviget.domain.direction.model.DirectionData;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class NegativeDiagonalDirection implements Direction {
 
     @Override

@@ -7,6 +7,7 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static com.deviget.domain.utils.ColorConverter.buildRGBArray;
@@ -31,6 +32,9 @@ public class BoardResponse {
     List<CellResponse> cellList;
 
     public static BoardResponse of(Board board) {
+        if (Objects.isNull(board)) {
+            return null;
+        }
         return BoardResponse.builder()
                 .cellLength(board.getCellLength())
                 .rowNum(board.getRowNum())

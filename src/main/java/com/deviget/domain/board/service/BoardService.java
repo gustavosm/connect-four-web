@@ -16,6 +16,7 @@ import com.deviget.domain.direction.impl.VerticalDirection;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -125,6 +126,14 @@ public class BoardService {
                 .humanChosenCell(humanChosenCell).build();
     }
 
+    public Board restartBoard(Long userId) {
+        Board board = boardRepo.get(userId);
+        if (!Objects.isNull(board)) {
+            board.setDefaultConditions();
+            board.getCellList().stream().forEach(Cell::setDefaultConditions);
+        }
+        return board;
+    }
 }
 
 

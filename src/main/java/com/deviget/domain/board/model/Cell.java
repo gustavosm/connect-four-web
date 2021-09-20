@@ -24,4 +24,9 @@ public class Cell {
                 .cellInUse(Boolean.FALSE)
                 .build();
     }
+
+    public void setDefaultConditions() {
+        this.cellColor = Color.WHITE;
+        this.cellInUse = Boolean.FALSE;
+    }
 }

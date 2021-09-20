@@ -42,6 +42,25 @@ $(document).ready(function(){
         }
     });
 
+    $("#restart").click(function() {
+        count = 0;
+        boardStatus = 0;
+        finalStage = false;
+        jQuery.post({
+            url: "http://localhost:8090/board/restart/1",
+            success: function(data) {
+                boardStatus = data['boardStatus'];
+                setBackgroundColor(data['backgroundRGBAlphaArray'], ".grid");
+                var cellList = data['cellList'];
+                cellList.forEach((cell) => {
+                    var divCell = "#" + cell.cellId;
+                    $(divCell).attr("id", cell.cellId);
+                    $(divCell).attr("data-player", (cell.cellInUse ? 1 : 0));
+                    setBackgroundColor(cell.backgroundRGBAlphaArray, divCell);
+                });
+            }
+        });
+    });
 
     function setBackgroundColor(rgbArray, clss) {
         $(clss).css("background-color", 'rgb('+rgbArray[0]+','+rgbArray[1]+','+rgbArray[2]+')');
@@ -84,9 +103,10 @@ $(document).ready(function(){
     }
 
     function refresh(cell) {
-        $("#" + cell.cellId).attr("data-player", "1");
-        setBackgroundColor(cell.backgroundRGBAlphaArray, ("#" + cell.cellId));
-        $("#" + cell.cellId).toggleClass("cell_hover", false);
+        var divCell = "#" + cell.cellId;
+        $(divCell).attr("data-player", "1");
+        setBackgroundColor(cell.backgroundRGBAlphaArray, (divCell));
+        $(divCell).toggleClass("cell_hover", false);
     }
 
     function processBoardStatus(boardStatus) {
