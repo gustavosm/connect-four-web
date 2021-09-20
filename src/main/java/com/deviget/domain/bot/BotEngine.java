@@ -23,8 +23,8 @@ public class BotEngine {
 
     BotStrategy botStrategy;
 
-    public Cell doMovement(Board board) {
-        Cell chosenCell = botStrategy.choseACell(board, cellService);
+    public Cell doMovement(Board board, Cell humanChosenCell) {
+        Cell chosenCell = botStrategy.choseACell(board, humanChosenCell, cellService);
         cellService.markCellAsUsed(chosenCell, Color.YELLOW);
         board.adjustMovements();
         return chosenCell;

@@ -10,44 +10,61 @@ import lombok.extern.slf4j.Slf4j;
 public class HorizontalDirection implements Direction {
 
     @Override
-    public Long nextUpMovement(DirectionData directionData) {
+    public Long nextLeftMovement(DirectionData directionData) {
         Board board = directionData.getBoard();
 
         Long actualCellId = directionData.getActualCellId();
 
-        Long nextCellId = actualCellId + 1;
+        Long nextCellId = calcLeftMovement(directionData);
 
         Cell startCell = board.getCell(actualCellId);
-        if (outOfUpMovementBound(board, nextCellId) || !checkIfSameUser(board, nextCellId, startCell)) {
+        if (nextCellId == -1L || !checkIfSameUser(board, nextCellId, startCell)) {
             return -1L;
         }
         return nextCellId;
     }
 
     @Override
-    public Long nextDownMovement(DirectionData directionData) {
+    public Long nextRightMovement(DirectionData directionData) {
         Board board = directionData.getBoard();
-        Long columnNum = board.getColumnNum();
 
         Long actualCellId = directionData.getActualCellId();
 
-        Long nextCellId = actualCellId - 1;
+        Long nextCellId = calcRightMovement(directionData);
 
         Cell startCell = board.getCell(actualCellId);
 
-        if (outOfDownMovementBound(nextCellId, columnNum) || !checkIfSameUser(board, nextCellId, startCell)) {
+        if (nextCellId == -1L || !checkIfSameUser(board, nextCellId, startCell)) {
             return -1L;
         }
         return nextCellId;
     }
 
-    private boolean outOfUpMovementBound(Board board, Long nextCellId) {
-        Long columnNum = board.getColumnNum();
-        return nextCellId >= board.getCellNum() || nextCellId % columnNum == 0;
+    @Override
+    public Long calcLeftMovement(DirectionData directionData) {
+        Board board = directionData.getBoard();
+
+        Long nextCellId = directionData.getActualCellId() - 1;
+
+        return outOfLeftMovementBound(nextCellId, board.getColumnNum()) ? -1L : nextCellId;
     }
 
-    private boolean outOfDownMovementBound(Long nextCellId, Long columnNum) {
+    @Override
+    public Long calcRightMovement(DirectionData directionData) {
+        Board board = directionData.getBoard();
+
+        Long nextCellId = directionData.getActualCellId() + 1;
+
+        return outOfRightMovementBound(board, nextCellId) ? -1L : nextCellId;
+    }
+
+    private boolean outOfLeftMovementBound(Long nextCellId, Long columnNum) {
         return nextCellId < 0 || nextCellId % columnNum == columnNum - 1;
+    }
+
+    private boolean outOfRightMovementBound(Board board, Long nextCellId) {
+        Long columnNum = board.getColumnNum();
+        return nextCellId >= board.getCellNum() || nextCellId % columnNum == 0;
     }
 
     private boolean checkIfSameUser(Board board, Long nextCellId, Cell startCell) {

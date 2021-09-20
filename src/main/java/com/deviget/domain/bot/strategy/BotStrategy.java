@@ -6,6 +6,6 @@ import com.deviget.domain.board.service.CellService;
 
 public interface BotStrategy {
 
-    Cell choseACell(Board board, CellService cellService);
+    Cell choseACell(Board board, Cell humanChosenCell, CellService cellService);
 
 }

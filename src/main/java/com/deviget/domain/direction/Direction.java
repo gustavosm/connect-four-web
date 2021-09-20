@@ -4,8 +4,12 @@ import com.deviget.domain.direction.model.DirectionData;
 
 public interface Direction {
 
-    Long nextUpMovement(DirectionData directionData);
+    Long nextLeftMovement(DirectionData directionData);
 
-    Long nextDownMovement(DirectionData directionData);
+    Long nextRightMovement(DirectionData directionData);
+
+    Long calcLeftMovement(DirectionData directionData);
+
+    Long calcRightMovement(DirectionData directionData);
 
 }

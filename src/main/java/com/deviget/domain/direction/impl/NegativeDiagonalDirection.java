@@ -10,42 +10,58 @@ import lombok.extern.slf4j.Slf4j;
 public class NegativeDiagonalDirection implements Direction {
 
     @Override
-    public Long nextUpMovement(DirectionData directionData) {
+    public Long nextLeftMovement(DirectionData directionData) {
         Board board = directionData.getBoard();
 
         Long actualCellId = directionData.getActualCellId();
-        Long columnNum = board.getColumnNum();
+        Long nextCellId = calcLeftMovement(directionData);
 
-        Long nextCellId = actualCellId - columnNum - 1;
-
-        Cell startCell = board.getCell(actualCellId);
-        if (outOfUpMovementBound(nextCellId, columnNum) || !checkIfSameUser(board, nextCellId, startCell)) {
+        if (nextCellId == -1L || !checkIfSameUser(board, nextCellId, board.getCell(actualCellId))) {
             return -1L;
         }
         return nextCellId;
     }
 
     @Override
-    public Long nextDownMovement(DirectionData directionData) {
+    public Long nextRightMovement(DirectionData directionData) {
         Board board = directionData.getBoard();
 
+        Long nextCellId = calcRightMovement(directionData);
         Long actualCellId = directionData.getActualCellId();
-        Long columnNum = board.getColumnNum();
 
-        Long nextCellId = actualCellId + columnNum + 1;
-
-        Cell startCell = board.getCell(actualCellId);
-        if (outOfDownMovementBound(board, nextCellId) || !checkIfSameUser(board, nextCellId, startCell)) {
+        if (nextCellId == -1L || !checkIfSameUser(board, nextCellId, board.getCell(actualCellId))) {
             return -1L;
         }
         return nextCellId;
     }
 
-    private boolean outOfUpMovementBound(Long nextCellId, Long columnNum) {
+    @Override
+    public Long calcLeftMovement(DirectionData directionData) {
+        Board board = directionData.getBoard();
+
+        Long actualCellId = directionData.getActualCellId();
+        Long columnNum = board.getColumnNum();
+        Long nextCellId = actualCellId - columnNum - 1;
+
+        return outOfLeftMovementBound(board, nextCellId) ? -1L : nextCellId;
+    }
+
+    @Override
+    public Long calcRightMovement(DirectionData directionData) {
+        Board board = directionData.getBoard();
+
+        Long actualCellId = directionData.getActualCellId();
+        Long columnNum = board.getColumnNum();
+        Long nextCellId = actualCellId + columnNum + 1;
+
+        return outOfRightMovementBound(nextCellId, columnNum) ? -1L : nextCellId;
+    }
+
+    private boolean outOfRightMovementBound(Long nextCellId, Long columnNum) {
         return nextCellId < 0 || nextCellId % columnNum == columnNum - 1;
     }
 
-    private boolean outOfDownMovementBound(Board board, Long nextCellId) {
+    private boolean outOfLeftMovementBound(Board board, Long nextCellId) {
         Long columnNum = board.getColumnNum();
         return nextCellId >= board.getCellNum() || nextCellId % columnNum == 0;
     }

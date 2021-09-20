@@ -16,7 +16,6 @@ import com.deviget.domain.direction.impl.VerticalDirection;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -59,7 +58,7 @@ public class BoardService {
         Board board = boardRepo.get(userId);
         checkBoard(userId, board);
         Cell humanChosenCell = cellService.doMovement(board, clickedCell.getCellId());
-        Cell botChosenCell = botEngine.doMovement(board);
+        Cell botChosenCell = botEngine.doMovement(board, humanChosenCell);
         checkIfIsAFinalStage(board, humanChosenCell, botChosenCell);
         return buildResponse(board, humanChosenCell, botChosenCell);
     }
@@ -97,10 +96,10 @@ public class BoardService {
 
         DirectionData directionData = DirectionData.builder().actualCellId(actualCellId).board(board).build();
 
-        Long alignedCellsToWin = doAllPossibleMovements(directionData, 4L, direction::nextUpMovement);
+        Long alignedCellsToWin = doAllPossibleMovements(directionData, 4L, direction::nextLeftMovement);
         if (alignedCellsToWin != 0L) {
             directionData.setActualCellId(actualCellId);
-            alignedCellsToWin = doAllPossibleMovements(directionData, alignedCellsToWin + 1L, direction::nextDownMovement);
+            alignedCellsToWin = doAllPossibleMovements(directionData, alignedCellsToWin + 1L, direction::nextRightMovement);
         }
         return alignedCellsToWin == 0L;
     }
