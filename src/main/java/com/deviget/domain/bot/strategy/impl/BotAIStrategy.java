@@ -37,7 +37,7 @@ public class BotAIStrategy implements BotStrategy {
 
         for (Direction direction : directions) {
             LongPair result = canIAvoidWinInDirection(direction, directionData, cellService);
-            if (result.getFirst() > maxAlignedCells) {
+            if (result.getFirst() > maxAlignedCells && result.getSecond() != -1L) {
                 maxAlignedCells = result.getFirst();
                 nextCellId = result.getSecond();
                 if (maxAlignedCells == 3L) { //no way to find any greater then this
