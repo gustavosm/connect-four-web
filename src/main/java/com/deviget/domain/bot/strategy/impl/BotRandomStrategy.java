@@ -39,8 +39,7 @@ public class BotRandomStrategy implements BotStrategy {
                  **/
                 cellId = getRandom(cellNum);
             }
-            Long column = cellService.getFirstIdOfColumn(cellId, cellNum);
-            Long chosenId = cellService.getLastFreeIdOfColumn(board, column);
+            Long chosenId = cellService.getLastFreeIdOfColumn(board, cellId);
             chosenCell = board.getCell(chosenId);
             found = !chosenCell.getCellInUse();
         }

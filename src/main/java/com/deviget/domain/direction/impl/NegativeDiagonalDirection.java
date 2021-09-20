@@ -43,7 +43,7 @@ public class NegativeDiagonalDirection implements Direction {
         Long columnNum = board.getColumnNum();
         Long nextCellId = actualCellId - columnNum - 1;
 
-        return outOfLeftMovementBound(board, nextCellId) ? -1L : nextCellId;
+        return outOfLeftMovementBound(nextCellId, columnNum) ? -1L : nextCellId;
     }
 
     @Override
@@ -54,14 +54,14 @@ public class NegativeDiagonalDirection implements Direction {
         Long columnNum = board.getColumnNum();
         Long nextCellId = actualCellId + columnNum + 1;
 
-        return outOfRightMovementBound(nextCellId, columnNum) ? -1L : nextCellId;
+        return outOfRightMovementBound(board, columnNum) ? -1L : nextCellId;
     }
 
-    private boolean outOfRightMovementBound(Long nextCellId, Long columnNum) {
+    private boolean outOfLeftMovementBound(Long nextCellId, Long columnNum) {
         return nextCellId < 0 || nextCellId % columnNum == columnNum - 1;
     }
 
-    private boolean outOfLeftMovementBound(Board board, Long nextCellId) {
+    private boolean outOfRightMovementBound(Board board, Long nextCellId) {
         Long columnNum = board.getColumnNum();
         return nextCellId >= board.getCellNum() || nextCellId % columnNum == 0;
     }

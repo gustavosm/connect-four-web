@@ -15,11 +15,8 @@ public class CellService {
 
     public Cell doMovement(Board board, Long cellId) {
 
-        Long id = getFirstIdOfColumn(cellId, board.getColumnNum());
-
-        if (!board.getCell(id).getCellInUse()) {
-            id = getLastFreeIdOfColumn(board, id);
-
+        Long id = getLastFreeIdOfColumn(board, cellId);
+        if (id != -1L) {
             Cell usedCell = board.getCell(id);
             markCellAsUsed(usedCell, Color.RED);
             board.adjustMovements();
@@ -28,18 +25,15 @@ public class CellService {
         throw new InvalidMovementRequest("The chosen column is full.");
     }
 
-    public Long getFirstIdOfColumn(Long id, Long columnNum) {
-        return id % columnNum;
-    }
-
-    public Long getLastFreeIdOfColumn(Board board, Long id) {
+    public Long getLastFreeIdOfColumn(Board board, Long initialColumn) {
         Long columnNum = board.getColumnNum();
+        Long id = initialColumn % columnNum;
         Long cellNum = board.getCellNum();
 
         while (id + columnNum < cellNum && !board.getCell(id + columnNum).getCellInUse()) {
             id += columnNum;
         }
-        return id;
+        return board.getCell(id).getCellInUse() ? -1L : id;
     }
 
     public void markCellAsUsed(Cell usedCell, Color color) {

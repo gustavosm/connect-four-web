@@ -16,7 +16,7 @@ public class PositiveDiagonalDirection implements Direction {
         Long actualCellId = directionData.getActualCellId();
         Long nextCellId = calcLeftMovement(directionData);
 
-        if (nextCellId == 1L || !checkIfSameUser(board, nextCellId, board.getCell(actualCellId))) {
+        if (nextCellId == -1L || !checkIfSameUser(board, nextCellId, board.getCell(actualCellId))) {
             return -1L;
         }
         return nextCellId;

@@ -48,15 +48,15 @@ public class BotAIStrategy implements BotStrategy {
     private Long choseAnEmptyCell(Board board, Long humanChosenCellId, CellService cellService) {
         Long columnNum = board.getColumnNum();
         Long nextCellId = humanChosenCellId;
-        Long firstIdOfColumn = 0L;
+        Long firstIdOfColumn;
         int operator = 1;
         do {
             if (onAnyBorder(columnNum, nextCellId)) {
                 operator *= -1;
             }
             nextCellId = (humanChosenCellId + operator) % columnNum;
-            firstIdOfColumn = cellService.getFirstIdOfColumn(nextCellId, columnNum);
-        } while (board.getCell(firstIdOfColumn).getCellInUse());
+            firstIdOfColumn = cellService.getLastFreeIdOfColumn(board, nextCellId);
+        } while (firstIdOfColumn != -1L);
 
         //for sure there's an answer because the tie is not possible before some BOT movement
         return nextCellId;
