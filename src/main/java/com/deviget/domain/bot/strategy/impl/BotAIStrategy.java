@@ -11,76 +11,90 @@ import com.deviget.domain.direction.impl.NegativeDiagonalDirection;
 import com.deviget.domain.direction.impl.PositiveDiagonalDirection;
 import com.deviget.domain.direction.impl.VerticalDirection;
 import com.deviget.domain.direction.model.DirectionData;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 import java.awt.*;
+import java.util.List;
 import java.util.function.Function;
 
 import static com.deviget.domain.utils.DistanceUtils.calculateDistance;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor(onConstructor_ = @Autowired)
 @ConditionalOnProperty(value = "strategy.ai", havingValue = "true")
 public class BotAIStrategy implements BotStrategy {
 
     Direction[] directions = {new HorizontalDirection(), new VerticalDirection(), new PositiveDiagonalDirection(), new NegativeDiagonalDirection()};
 
+    final CellService cellService;
+
     @Override
-    public Cell choseACell(Board board, Cell ignored, CellService cellService) {
-        Long nextCellId = -1L;
-        Long maxAlignedCells = -1L;
-        Long humanChosenCellCellId = 0L;
+    public Cell choseACell(Board board, Cell ignored) {
+        log.info(String.format("BotAIStrategy will chose a cell. Board %d.", board.getUserId()));
 
-        for (Cell humanChosenCell : board.getCellList()) {
-            if (humanChosenCell.getCellInUse() && Color.RED.equals(humanChosenCell.getCellColor())) {
-                humanChosenCellCellId = humanChosenCell.getCellId();
-                DirectionData directionData = DirectionData.builder().actualCellId(humanChosenCellCellId)
-                        .board(board).build();
+        List<Cell> cellList = board.getCellList();
+        Long botCellId = cellList.stream().filter(cell -> Color.RED.equals(cell.getCellColor()))
+                .map(cell -> computeLongPair(board, cell))
+                .max(LongPair::compareTo)
+                .orElse(new LongPair(-1L, -1L))
+                .getSecond();
 
-                for (Direction direction : directions) {
-                    LongPair result = canIAvoidWinInDirection(direction, directionData, cellService);
-                    if (result.getFirst() > maxAlignedCells && result.getSecond() != -1L) {
-                        maxAlignedCells = result.getFirst();
-                        nextCellId = result.getSecond();
-                        if (maxAlignedCells == 3L) { //no way to find any greater then this
-                            return board.getCell(nextCellId);
-                        }
-                    }
-                    resetDirectionData(directionData, humanChosenCellCellId);
-                }
-            }
+        if (botCellId == -1L) {
+            botCellId = choseAnEmptyCell(board, cellService);
         }
-        if (nextCellId == -1L) {
-            nextCellId = choseAnEmptyCell(board, humanChosenCellCellId, cellService);
-        }
-        log.info("Escolhi a cell: " + nextCellId);
-        return board.getCell(nextCellId);
+        log.info("Bot chosen cell: " + botCellId);
+        return board.getCell(botCellId);
     }
 
-    private Long choseAnEmptyCell(Board board, Long humanChosenCellId, CellService cellService) {
+    private LongPair computeLongPair(Board board, Cell humanCell) {
+        LongPair response = new LongPair(-1L, -1L);
+
+        Long maxAlignedCells = -1L;
+        Long humanChosenCellCellId = humanCell.getCellId();
+
+        DirectionData directionData = DirectionData.builder().actualCellId(humanChosenCellCellId)
+                .board(board).build();
+
+        for (Direction direction : directions) {
+            LongPair result = canIAvoidWinInDirection(direction, directionData);
+            if (result.getFirst() > maxAlignedCells && result.getSecond() != -1L) {
+                maxAlignedCells = result.getFirst();
+                response = result;
+            }
+            resetDirectionData(directionData, humanChosenCellCellId);
+        }
+        return response;
+    }
+
+    private Long choseAnEmptyCell(Board board, CellService cellService) {
         Long columnNum = board.getColumnNum();
-        Long nextCellId = humanChosenCellId;
+        Long nextCellId = 0L;
         Long firstIdOfColumn;
-        int operator = 1;
+
+        int operator = -1;
+
         do {
             if (isCellOnAnyBorder(columnNum, nextCellId)) {
                 operator *= -1;
             }
-            nextCellId = (humanChosenCellId + operator) % columnNum;
+            nextCellId = (nextCellId + operator) % columnNum;
             firstIdOfColumn = cellService.getLastFreeIdOfColumn(board, nextCellId);
-        } while (firstIdOfColumn != -1L);
+        } while (firstIdOfColumn == -1L);
 
         //for sure there's an answer because the tie is not possible before some BOT movement
-        return nextCellId;
+        return firstIdOfColumn;
     }
 
     private boolean isCellOnAnyBorder(Long columnNum, Long nextCellId) {
         return nextCellId % columnNum == (columnNum - 1L) || nextCellId % columnNum == 0L;
     }
 
-    private LongPair canIAvoidWinInDirection(Direction direction, DirectionData directionData, CellService cellService) {
+    private LongPair canIAvoidWinInDirection(Direction direction, DirectionData directionData) {
 
         Board board = directionData.getBoard();
 

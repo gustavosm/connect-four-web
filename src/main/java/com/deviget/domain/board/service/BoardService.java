@@ -14,6 +14,7 @@ import com.deviget.domain.direction.impl.NegativeDiagonalDirection;
 import com.deviget.domain.direction.impl.PositiveDiagonalDirection;
 import com.deviget.domain.direction.impl.VerticalDirection;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,7 +28,7 @@ import static com.deviget.domain.board.enums.BoardStatus.*;
 
 @Slf4j
 @Service
-@AllArgsConstructor(onConstructor_ = @Autowired)
+@RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class BoardService {
 
     static final VerticalDirection VERTICAL_DIRECTION = new VerticalDirection();
@@ -38,29 +39,43 @@ public class BoardService {
 
     static final NegativeDiagonalDirection NEGATIVE_DIAGONAL_DIRECTION = new NegativeDiagonalDirection();
 
-    static Map<Long, Board> boardRepo = new HashMap<>();
+    final CellService cellService;
 
-    CellService cellService;
+    final BotEngine botEngine;
 
-    BotEngine botEngine;
+    Map<Long, Board> boardRepo = new HashMap<>();
 
     public Board getOrCreateBoard(Long userId) {
         return boardRepo.computeIfAbsent(userId, this::createBoard);
+    }
+
+    public Movement doMovement(Long userId, Cell clickedCell) {
+        Board board = boardRepo.get(userId);
+        checkBoard(userId, board);
+
+        log.info("doMovement board already checked. Will execute movements.");
+
+        Cell humanChosenCell = cellService.doMovement(board, clickedCell.getCellId());
+        Cell botChosenCell = botEngine.doMovement(board, humanChosenCell);
+        checkIfIsAFinalStage(board, humanChosenCell, botChosenCell);
+
+        log.info("Movements executed. Returning response.");
+        return buildResponse(board, humanChosenCell, botChosenCell);
+    }
+
+    public Board restartBoard(Long userId) {
+        Board board = boardRepo.get(userId);
+        if (!Objects.isNull(board)) {
+            board.setDefaultConditions();
+            board.getCellList().stream().forEach(Cell::setDefaultConditions);
+        }
+        return board;
     }
 
     private Board createBoard(Long userId) {
         log.info("New board created for user: {}", userId);
         Board board = new Board(userId);
         return board;
-    }
-
-    public Movement doMovement(Long userId, Cell clickedCell) {
-        Board board = boardRepo.get(userId);
-        checkBoard(userId, board);
-        Cell humanChosenCell = cellService.doMovement(board, clickedCell.getCellId());
-        Cell botChosenCell = botEngine.doMovement(board, humanChosenCell);
-        checkIfIsAFinalStage(board, humanChosenCell, botChosenCell);
-        return buildResponse(board, humanChosenCell, botChosenCell);
     }
 
     private void checkBoard(Long userId, Board board) {
@@ -92,6 +107,7 @@ public class BoardService {
     }
 
     private boolean checkWin(Direction direction, Board board, Cell chosenCell) {
+        log.info("Checking win conditions. Direction: " + direction.getClass().getSimpleName());
         Long actualCellId = chosenCell.getCellId();
 
         DirectionData directionData = DirectionData.builder().actualCellId(actualCellId).board(board).build();
@@ -123,15 +139,6 @@ public class BoardService {
         return Movement.builder().boardStatus(board.getBoardStatus())
                 .botChosenCell(botChosenCell)
                 .humanChosenCell(humanChosenCell).build();
-    }
-
-    public Board restartBoard(Long userId) {
-        Board board = boardRepo.get(userId);
-        if (!Objects.isNull(board)) {
-            board.setDefaultConditions();
-            board.getCellList().stream().forEach(Cell::setDefaultConditions);
-        }
-        return board;
     }
 }
 

@@ -8,9 +8,21 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class LongPair {
+public class LongPair implements Comparable<LongPair> {
 
     Long first;
 
     Long second;
+
+    @Override
+    public int compareTo(LongPair o) {
+        Long oFirst = o.first;
+        Long oSecond = o.second;
+
+        if (first != oFirst) {
+            return first.compareTo(oFirst);
+        }
+        return second.compareTo(second);
+
+    }
 }

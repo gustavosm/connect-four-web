@@ -24,7 +24,8 @@ public class BotEngine {
     BotStrategy botStrategy;
 
     public Cell doMovement(Board board, Cell humanChosenCell) {
-        Cell chosenCell = botStrategy.choseACell(board, humanChosenCell, cellService);
+        log.info(String.format("Bot Engine will chose a cell. Board %d.", board.getUserId()));
+        Cell chosenCell = botStrategy.choseACell(board, humanChosenCell);
         cellService.markCellAsUsed(chosenCell, Color.YELLOW);
         board.adjustMovements();
         return chosenCell;

@@ -4,7 +4,9 @@ import com.deviget.domain.board.model.Board;
 import com.deviget.domain.board.model.Cell;
 import com.deviget.domain.board.service.CellService;
 import com.deviget.domain.bot.strategy.BotStrategy;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
@@ -13,18 +15,21 @@ import java.util.ArrayList;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor(onConstructor_ = @Autowired)
 @ConditionalOnProperty(value = "strategy.ai", havingValue = "false", matchIfMissing = true)
 public class BotRandomStrategy implements BotStrategy {
 
     static final SecureRandom secureRandom = new SecureRandom();
 
+    final CellService cellService;
+
     @Override
-    public Cell choseACell(Board board, Cell humanChosenCell, CellService cellService) {
+    public Cell choseACell(Board board, Cell humanChosenCell) {
         Long cellNum = board.getCellNum();
         Long cellId;
         Boolean found = Boolean.FALSE;
 
-        ArrayList<Long> possiblePositions = getAllPossiblePositions(board, humanChosenCell, cellService);
+        ArrayList<Long> possiblePositions = getAllPossiblePositions(board, humanChosenCell);
 
         Cell chosenCell = null;
         while (!found) {
@@ -47,7 +52,7 @@ public class BotRandomStrategy implements BotStrategy {
         return chosenCell;
     }
 
-    private ArrayList<Long> getAllPossiblePositions(Board board, Cell humanChosenCell, CellService cellService) {
+    private ArrayList<Long> getAllPossiblePositions(Board board, Cell humanChosenCell) {
 
         ArrayList<Long> possiblePositions = new ArrayList<>();
         Long columnNum = board.getColumnNum();

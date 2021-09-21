@@ -14,14 +14,16 @@ import java.util.Objects;
 public class CellService {
 
     public Cell doMovement(Board board, Long cellId) {
-
+        log.info(String.format("CellService will do a movement. Board %d.", board.getUserId()));
         Long id = getLastFreeIdOfColumn(board, cellId);
         if (id != -1L) {
             Cell usedCell = board.getCell(id);
             markCellAsUsed(usedCell, Color.RED);
             board.adjustMovements();
+            log.info(String.format("Could do a movement in cell: %d", usedCell.getCellId()));
             return usedCell;
         }
+        log.info("The column user chosen is full");
         throw new InvalidMovementRequest("The chosen column is full.");
     }
 

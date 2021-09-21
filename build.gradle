@@ -18,14 +18,42 @@ repositories {
 dependencies {
     //Spring Boot
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter'
+    implementation 'org.springframework.boot:spring-boot-starter-parent:2.5.0'
     implementation 'org.projectlombok:lombok:1.18.20'
+    implementation 'junit:junit:4.13.1'
 
     // Lombok Dependency
     compileOnly 'org.projectlombok:lombok:1.18.20'
     annotationProcessor 'org.projectlombok:lombok:1.18.20'
 
+    //Swagger
+    // https://mvnrepository.com/artifact/io.springfox/springfox-swagger2
+    implementation group: 'io.springfox', name: 'springfox-swagger2', version: '2.9.2'
+    // https://mvnrepository.com/artifact/io.springfox/springfox-swagger-ui
+    implementation group: 'io.springfox', name: 'springfox-swagger-ui', version: '2.9.2'
+    // https://mvnrepository.com/artifact/io.springfox/springfox-swagger-ui
+    implementation group: 'io.springfox', name: 'springfox-schema', version: '2.9.2'
+
     //Spring Boot Test
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+    //Rest Assured
+    testImplementation 'io.rest-assured:spring-mock-mvc:4.1.1'
+
+    //Arch rule
+    testImplementation 'com.tngtech.archunit:archunit:0.12.0'
+
+    //Mockito
+    testImplementation group: 'org.mockito', name: 'mockito-core', version: '2.22.0'
+
+    //JUnitPlatform
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.3.1'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.3.1'
+
+    //JUnit compatibility
+    testCompileOnly 'junit:junit:4.12'
+    testRuntimeOnly 'org.junit.vintage:junit-vintage-engine:5.3.1'
 }
 
 bootJar {
