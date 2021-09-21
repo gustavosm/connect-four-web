@@ -6,7 +6,7 @@ $(document).ready(function(){
     var alertMessage = '';
 
     jQuery.post({
-        url: "http://localhost:8090/board/2",
+        url: "https://connect-four-web-deviget.herokuapp.com/board/2",
         success: function(data) {
             boardStatus = data['boardStatus'];
             setBackgroundColor(data['backgroundRGBAlphaArray'], ".grid");
@@ -47,7 +47,7 @@ $(document).ready(function(){
         boardStatus = 0;
         finalStage = false;
         jQuery.post({
-            url: "http://localhost:8090/board/restart/2",
+            url: "https://connect-four-web-deviget.herokuapp.com/board/restart/2",
             success: function(data) {
                 boardStatus = data['boardStatus'];
                 setBackgroundColor(data['backgroundRGBAlphaArray'], ".grid");
@@ -71,7 +71,7 @@ $(document).ready(function(){
             var postData = {};
             postData["cellId"] = cellId;
             jQuery.post({
-                url: "http://localhost:8090/board/play/2",
+                url: "https://connect-four-web-deviget.herokuapp.com/board/play/2",
                 data: JSON.stringify(postData),
                 contentType: 'application/json',
                 dataType: 'json',
