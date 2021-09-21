@@ -11,7 +11,7 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void addViewControllers(ViewControllerRegistry registry) {
-        registry.addViewController("/user/1").setViewName("redirect:/user/1/index.html");
-        registry.addViewController("/user/2").setViewName("redirect:/user/2/index.html");
+        registry.addViewController("/games/1").setViewName("redirect:/games/1/index.html");
+        registry.addViewController("/games/2").setViewName("redirect:/games/2/index.html");
     }
 }
