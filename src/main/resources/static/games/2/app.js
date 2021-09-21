@@ -1,7 +1,7 @@
 $(document).ready(function(){
     var boardStatus = 0;
     var count = 0;
-    var hostName = "http://localhost:8080/";//"https://connect-four-web-deviget.herokuapp.com/";
+    var hostName = "https://connect-four-web-deviget.herokuapp.com/";
     var finalStage = false;
     var alertMessage = '';
 
