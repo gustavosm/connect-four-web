@@ -43,7 +43,7 @@ public class VerticalDirection implements Direction {
         Long columnNum = board.getColumnNum();
         Long nextCellId = actualCellId - columnNum;
 
-        return outOfUpMovementBound(nextCellId) ? -1L : nextCellId;
+        return outOfLeftMovementBound(nextCellId) ? -1L : nextCellId;
     }
 
     @Override
@@ -58,7 +58,7 @@ public class VerticalDirection implements Direction {
         return outOfRightMovementBound(board, nextCellId) ? -1L : nextCellId;
     }
 
-    private boolean outOfUpMovementBound(Long nextCellId) {
+    private boolean outOfLeftMovementBound(Long nextCellId) {
         return nextCellId < 0 ;
     }
 

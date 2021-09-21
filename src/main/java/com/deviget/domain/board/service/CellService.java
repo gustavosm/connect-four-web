@@ -29,11 +29,18 @@ public class CellService {
         Long columnNum = board.getColumnNum();
         Long id = initialColumn % columnNum;
         Long cellNum = board.getCellNum();
+        if (!isValidId(initialColumn, cellNum)) {
+            return -1L;
+        }
 
         while (id + columnNum < cellNum && !board.getCell(id + columnNum).getCellInUse()) {
             id += columnNum;
         }
         return board.getCell(id).getCellInUse() ? -1L : id;
+    }
+
+    private boolean isValidId(Long initialColumn, Long cellNum) {
+        return initialColumn >= 0 && initialColumn < cellNum;
     }
 
     public void markCellAsUsed(Cell usedCell, Color color) {
