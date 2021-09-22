@@ -45,7 +45,7 @@ public class BotAIStrategy implements BotStrategy {
                 .getSecond();
 
         if (botCellId == -1L) {
-            botCellId = choseAnEmptyCell(board, cellService);
+            botCellId = choseAnEmptyCell(board);
         }
         log.info("Bot chosen cell: " + botCellId);
         return board.getCell(botCellId);
@@ -71,27 +71,18 @@ public class BotAIStrategy implements BotStrategy {
         return response;
     }
 
-    private Long choseAnEmptyCell(Board board, CellService cellService) {
+    private Long choseAnEmptyCell(Board board) {
         Long columnNum = board.getColumnNum();
-        Long nextCellId = 0L;
+        Long nextCellId = -1L;
         Long firstIdOfColumn;
 
-        int operator = -1;
-
         do {
-            if (isCellOnAnyBorder(columnNum, nextCellId)) {
-                operator *= -1;
-            }
-            nextCellId = (nextCellId + operator) % columnNum;
+            nextCellId = (nextCellId + 1L) % columnNum;
             firstIdOfColumn = cellService.getLastFreeIdOfColumn(board, nextCellId);
         } while (firstIdOfColumn == -1L);
 
         //for sure there's an answer because the tie is not possible before some BOT movement
         return firstIdOfColumn;
-    }
-
-    private boolean isCellOnAnyBorder(Long columnNum, Long nextCellId) {
-        return nextCellId % columnNum == (columnNum - 1L) || nextCellId % columnNum == 0L;
     }
 
     private LongPair canIAvoidWinInDirection(Direction direction, DirectionData directionData) {
